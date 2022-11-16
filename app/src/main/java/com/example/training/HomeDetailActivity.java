@@ -9,11 +9,12 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.training.utils.AppConstants;
+
 import java.util.Objects;
 
-public class HomeDetailActivity extends AppCompatActivity {
-    private static final String COUNTRY_NAME = "countryName";
-    public static String USER_FULL_NAME = "userName";
+public class HomeDetailActivity extends AppCompatActivity implements AppConstants {
+
     private String mFullName;
     private String mCountryName;
 
@@ -29,8 +30,8 @@ public class HomeDetailActivity extends AppCompatActivity {
     public static Intent getStartIntent(Context context, String countryName, String userName) {
         Intent homeDetailIntent = new Intent(context, HomeDetailActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(COUNTRY_NAME, countryName);
-        bundle.putString(USER_FULL_NAME, userName);
+        bundle.putString(AppConstants.COUNTRY_NAME, countryName);
+        bundle.putString(AppConstants.USER_NAME, userName);
         homeDetailIntent.putExtras(bundle);
         return homeDetailIntent;
     }
@@ -41,8 +42,8 @@ public class HomeDetailActivity extends AppCompatActivity {
             finish();
         } else {
             Bundle extras = intent.getExtras();
-            mCountryName = extras.getString(COUNTRY_NAME);
-            mFullName = extras.getString(USER_FULL_NAME);
+            mCountryName = extras.getString(AppConstants.COUNTRY_NAME);
+            mFullName = extras.getString(AppConstants.USER_NAME);
         }
     }
 

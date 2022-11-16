@@ -11,14 +11,15 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.training.utils.AppConstants;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements AppConstants {
 
-    public static String USER_NAME = "userName";
     private String mUserName;
     private final List<String> mCountriesList = new ArrayList<>();
 
@@ -36,7 +37,7 @@ public class HomeActivity extends AppCompatActivity {
     public static Intent getStartIntent(Context context, String name) {
         Intent loginIntent = new Intent(context, HomeActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(USER_NAME, name);
+        bundle.putString(AppConstants.USER_NAME, name);
         loginIntent.putExtras(bundle);
         return loginIntent;
     }
@@ -47,7 +48,7 @@ public class HomeActivity extends AppCompatActivity {
             finish();
         } else {
             Bundle extras = intent.getExtras();
-            mUserName = extras.getString(USER_NAME);
+            mUserName = extras.getString(AppConstants.USER_NAME);
         }
     }
 
