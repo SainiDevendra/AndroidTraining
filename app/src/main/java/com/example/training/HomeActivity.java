@@ -9,19 +9,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.training.db.dao.TaskDao;
+import com.example.training.db.database.TaskDatabase;
+import com.example.training.db.entity.Task;
 import com.example.training.utils.AppConstants;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class HomeActivity extends AppCompatActivity implements AppConstants {
 
-    private String mUserName;
-    private final List<String> mCountriesList = new ArrayList<>();
+    private List<Task> mTaskList = new ArrayList<>();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,34 +38,42 @@ public class HomeActivity extends AppCompatActivity implements AppConstants {
 
         handleIntent();
         initializeViewListeners();
-        addListData();
-        initializeRecyclerView();
     }
 
-    public static Intent getStartIntent(Context context, String name) {
-        Intent loginIntent = new Intent(context, HomeActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString(AppConstants.USER_NAME, name);
-        loginIntent.putExtras(bundle);
-        return loginIntent;
+    public static Intent getStartIntent(Context context) {
+        return new Intent(context, HomeActivity.class);
     }
 
     private void handleIntent() {
         Intent intent = getIntent();
-        if (intent == null) {
-            finish();
-        } else {
-            Bundle extras = intent.getExtras();
-            mUserName = extras.getString(AppConstants.USER_NAME);
-        }
+        Bundle extras = intent.getExtras();
     }
 
     private void initializeViewListeners() {
-        TextView name = findViewById(R.id.textViewFullName);
-        String fullName = "Welcome, " + mUserName;
-        name.setText(fullName);
-
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        TaskDatabase taskDatabase = TaskDatabase.getInstance(this);
+        TaskDao taskDao = taskDatabase.taskDao();
+        compositeDisposable.add(taskDao.getAllTask().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<Task>>() {
+                    @Override
+                    public void accept(List<Task> tasks) throws Throwable {
+                        mTaskList = tasks;
+                        if(mTaskList != null && !mTaskList.isEmpty()) {
+                            initializeRecyclerView();
+                        } else {
+                            Toast.makeText(HomeActivity.this, "No data available", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        throwable.printStackTrace();
+                        Toast.makeText(HomeActivity.this, "No data available", Toast.LENGTH_SHORT).show();
+                    }
+                })
+        );
     }
 
     @Override
@@ -72,13 +88,19 @@ public class HomeActivity extends AppCompatActivity implements AppConstants {
     private void addListData() {
         String[] arr = {"England", "Pakistan", "India", "New Zealand", "Australia", "South Africa",
                 "Sri Lanka", "Netherlands", "Ireland", "Zimbabwe", "Bangladesh", "Afghanistan"};
-        mCountriesList.addAll(Arrays.asList(arr));
     }
 
     private void initializeRecyclerView() {
         RecyclerView countriesRecyclerView = findViewById(R.id.recyclerView);
-        CountriesAdapter adapter = new CountriesAdapter(this, mCountriesList, mUserName);
+        CountriesAdapter adapter = new CountriesAdapter(this, mTaskList);
         countriesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         countriesRecyclerView.setAdapter(adapter);
     }
+
+    @Override
+    protected void onDestroy() {
+        compositeDisposable.clear();
+        super.onDestroy();
+    }
+
 }
