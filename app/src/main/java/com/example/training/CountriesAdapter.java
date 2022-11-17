@@ -11,18 +11,18 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.training.db.entity.Task;
+
 import java.util.List;
 
 public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.ViewHolder> {
 
-    private final List<String> mList;
+    private final List<Task> mList;
     private final Context mContext;
-    private final String mUserName;
 
-    public CountriesAdapter(Context context, List<String> list, String userName) {
+    public CountriesAdapter(Context context, List<Task> list) {
         this.mContext = context;
         this.mList = list;
-        this.mUserName = userName;
     }
 
     @NonNull
@@ -34,13 +34,14 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String countryName = mList.get(position);
-        holder.textViewName.setText(countryName);
+        Task task = mList.get(position);
+        holder.textViewName.setText(task.getName());
+        holder.textViewDescription.setText(task.getDescription());
 
-        holder.layout.setOnClickListener(view -> {
-            Intent homeDetailIntent = HomeDetailActivity.getStartIntent(mContext, countryName, mUserName);
-            mContext.startActivity(homeDetailIntent);
-        });
+//        holder.layout.setOnClickListener(view -> {
+//            Intent homeDetailIntent = HomeDetailActivity.getStartIntent(mContext, countryName, mUserName);
+//            mContext.startActivity(homeDetailIntent);
+//        });
     }
 
     @Override
@@ -51,12 +52,13 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ConstraintLayout layout;
-        public TextView textViewName;
+        public TextView textViewName, textViewDescription;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             layout = itemView.findViewById(R.id.listItemLayout);
-            textViewName = itemView.findViewById(R.id.textViewListItem);
+            textViewName = itemView.findViewById(R.id.textViewListItemName);
+            textViewDescription = itemView.findViewById(R.id.textViewListItemDescription);
         }
     }
 }

@@ -17,7 +17,7 @@
         android:gravity="center"
         android:textColor="@color/black"
         android:textSize="18sp"
-        android:text="Full Name"
+        android:text="Task Data"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
